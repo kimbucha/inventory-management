@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { TextField, Button, Box, Paper, Typography, Grid } from '@mui/material';
+import { TextField, Button, Box, Paper, Typography } from '@mui/material';
 import { addPantryItem, updatePantryItem } from '../lib/firebase';
 import { PantryItem } from '../lib/types';
 
@@ -17,12 +17,6 @@ const PantryForm = ({ initialData, onSubmit, onCancel }: { initialData?: PantryI
       setExpiryDate(new Date(initialData.expiryDate).toISOString().split('T')[0]);
       setCategory(initialData.category);
       setUserId(initialData.userId);
-    } else {
-      setName('');
-      setQuantity(1);
-      setExpiryDate('');
-      setCategory('');
-      setUserId('');
     }
   }, [initialData]);
 
@@ -40,18 +34,26 @@ const PantryForm = ({ initialData, onSubmit, onCancel }: { initialData?: PantryI
       await updatePantryItem(initialData.id, item);
     } else {
       await addPantryItem(item);
-      // Clear the form after adding a new item
-      setName('');
-      setQuantity(1);
-      setExpiryDate('');
-      setCategory('');
-      setUserId('');
     }
     onSubmit();
+    setName('');
+    setQuantity(1);
+    setExpiryDate('');
+    setCategory('');
+    setUserId('');
   }, [name, quantity, expiryDate, category, userId, initialData, onSubmit]);
 
+  const handleCancel = () => {
+    setName('');
+    setQuantity(1);
+    setExpiryDate('');
+    setCategory('');
+    setUserId('');
+    onCancel();
+  };
+
   return (
-    <Paper elevation={3} style={{ padding: '20px' }}>
+    <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
       <Typography variant="h6" gutterBottom>
         {initialData ? 'Update Item' : 'Add Item'}
       </Typography>
@@ -65,7 +67,7 @@ const PantryForm = ({ initialData, onSubmit, onCancel }: { initialData?: PantryI
           required
           margin="normal"
         />
-          <TextField
+        <TextField
           label="Category"
           variant="outlined"
           value={category}
@@ -106,44 +108,36 @@ const PantryForm = ({ initialData, onSubmit, onCancel }: { initialData?: PantryI
           required
           margin="normal"
         />
-        <Box mt={2}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{
-                  backgroundColor: 'white',
-                  color: 'black',
-                  '&:hover': {
-                    backgroundColor: 'lightgray',
-                  },
-                }}
-              >
-                {initialData ? 'Update Item' : 'Add Item'}
-              </Button>
-            </Grid>
-            {initialData && (
-              <Grid item xs={6}>
-                <Button
-                  type="button"
-                  variant="contained"
-                  fullWidth
-                  onClick={onCancel}
-                  sx={{
-                    backgroundColor: 'white',
-                    color: 'black',
-                    '&:hover': {
-                      backgroundColor: 'lightgray',
-                    },
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Grid>
-            )}
-          </Grid>
+        <Box mt={2} display="flex" justifyContent="space-between">
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: 'white',
+              color: 'black',
+              '&:hover': {
+                backgroundColor: 'lightgray',
+              },
+              marginRight: 1,
+            }}
+          >
+            {initialData ? 'Update Item' : 'Add Item'}
+          </Button>
+          {initialData && (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: 'white',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: 'lightgray',
+                },
+              }}
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+          )}
         </Box>
       </form>
     </Paper>
